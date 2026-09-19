@@ -2,13 +2,23 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 # ---------- Auth ----------
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+class RegistroRequest(BaseModel):
+    nombre: str
+    apellido: str
+    email: EmailStr
+    password: str = Field(min_length=6)
+    telefono: str | None = None
+    id_apartamento: int
+    rol: Literal["Residente_Principal", "Residente_Familiar"] = "Residente_Principal"
 
 
 class Token(BaseModel):
