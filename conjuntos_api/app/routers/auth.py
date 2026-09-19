@@ -3,10 +3,16 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Apartamento, Usuario
-from app.schemas import LoginRequest, RegistroRequest, Token, UsuarioOut
+from app.schemas import ApartamentoOut, LoginRequest, RegistroRequest, Token, UsuarioOut
 from app.security import create_access_token, get_current_user, hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.get("/apartamentos-disponibles", response_model=list[ApartamentoOut])
+def apartamentos_disponibles(db: Session = Depends(get_db)):
+    """Lista pública de apartamentos (solo lo necesario para el formulario de registro)."""
+    return db.query(Apartamento).order_by(Apartamento.torre, Apartamento.numero).all()
 
 
 @router.post("/registro", response_model=UsuarioOut, status_code=status.HTTP_201_CREATED)
