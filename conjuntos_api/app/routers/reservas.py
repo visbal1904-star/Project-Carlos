@@ -39,6 +39,23 @@ def crear_reserva(
     if zona is None:
         raise HTTPException(status_code=404, detail="Zona común no encontrada")
 
+    cruce = (
+        db.query(Reserva)
+        .filter(
+            Reserva.id_zona == payload.id_zona,
+            Reserva.fecha == payload.fecha,
+            Reserva.estado != "cancelada",
+            Reserva.hora_inicio < payload.hora_fin,
+            Reserva.hora_fin > payload.hora_inicio,
+        )
+        .first()
+    )
+    if cruce is not None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"La zona ya está reservada de {cruce.hora_inicio} a {cruce.hora_fin} ese día",
+        )
+
     reserva = Reserva(
         id_zona=payload.id_zona,
         id_usuario=current_user.id_usuario,
